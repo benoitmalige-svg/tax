@@ -105,7 +105,7 @@
     width:76px;height:76px;background:rgba(232,137,107,.85);border-radius:50%;
     display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.3);}
   .hero-top h1{margin:14px auto 12px;max-width:13ch;font-size:clamp(50px,13vw,92px);line-height:.94;}
-  .hero-top .sub{font-family:"Courier Prime",monospace;font-weight:700;font-size:clamp(14px,2.4vw,17px);letter-spacing:.02em;color:#8a5a3c;margin:8px auto 0;line-height:1.5;max-width:30ch;}
+  .hero-top .sub{font-family:"Courier Prime",monospace;font-weight:700;font-size:clamp(14px,2.4vw,17px);letter-spacing:.02em;color:#8a5a3c;margin:8px auto 22px;line-height:1.5;max-width:30ch;}
   .hero-top .q{max-width:32ch;margin:0 auto;font-weight:700;color:var(--navy);font-family:"Courier Prime",monospace;font-size:clamp(17px,2.6vw,20px);line-height:1.5;background:#f6e4cf;padding:16px 20px;border-radius:14px;box-shadow:var(--shadow-sm);}
 
   /* letter section: author photo -> white card */
@@ -175,6 +175,8 @@
   @media(max-width:820px){
     body{font-size:18.5px;line-height:1.5;font-weight:400;}
     .band{padding:58px 16px;}
+    .hero-top{padding:6px 16px 42px !important;}
+    .book-hero{margin:-58px auto 16px !important;}
     .cols2,.trio,.weeks{grid-template-columns:1fr;}
     .card,.toccard,.offercard{padding:30px 22px;}
     .lettercard{padding:40px 24px;font-size:18.5px;line-height:1.5;}
@@ -209,8 +211,8 @@
 
   /* hero purple break */
   .hero-purple{background:#3d2a44;padding:16px 22px 44px;}
-  .q-big{max-width:20ch;margin:0 auto 24px;color:#fff;font-family:"Archivo","Poppins",sans-serif;
-    font-weight:800;font-size:clamp(23px,5.2vw,40px);line-height:1.1;letter-spacing:-.01em;}
+  .q-big{max-width:22ch;margin:0 auto 24px;color:#fff;font-family:"Archivo","Poppins",sans-serif;
+    font-weight:800;font-size:clamp(22px,5vw,40px);line-height:1.15;letter-spacing:-.01em;}
   /* intro hook */
   .hook{padding-top:70px;padding-bottom:34px;}
   .hook-lede{font-family:"Courier Prime",monospace;font-weight:700;color:var(--navy);
