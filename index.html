@@ -58,11 +58,11 @@
   .btn{
     display:inline-block;font-family:"Poppins",sans-serif;font-weight:700;
     font-size:16px;letter-spacing:.02em;color:#fff;text-decoration:none;
-    background:linear-gradient(90deg,#5a3ea8,#e8896b);
+    background:var(--coral);
     padding:20px 40px;border-radius:16px;box-shadow:var(--shadow);
   }
   .btn .sub{display:block;font-family:"Courier Prime",monospace;font-weight:400;font-size:13px;opacity:.92;margin-top:4px;letter-spacing:0;}
-  .btn:hover{filter:brightness(1.04);}
+  .btn:hover{filter:brightness(1.06);}
   .btn-line{margin:38px 0 6px;}
 
   /* card / paper object */
@@ -258,6 +258,64 @@
   .act-promise{font-weight:400;font-style:italic;color:#6a5f52;text-transform:none;}
 
   .act-label{text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+
+  /* testimonials */
+  .tgrid{max-width:600px;margin:40px auto;}
+  .tcard{background:#fffdf8;border:1px solid rgba(0,0,0,.06);border-radius:16px;
+    box-shadow:0 16px 40px rgba(0,0,0,.35);padding:24px 24px;margin:0 auto 20px;text-align:left;width:100%;}
+  
+  .thead{font-family:"Poppins",sans-serif;font-weight:700;color:var(--coral);font-size:14px;line-height:1.35;margin-bottom:10px;}
+  .tcard .tquote{font-family:"Courier Prime",monospace;font-size:14.5px;line-height:1.6;color:#000 !important;margin:0 0 14px;}
+  
+  .tcard .twho{font-family:"Poppins",sans-serif;font-weight:700;font-size:13px;color:#3d2a44 !important;}
+  
+  .tprof{color:var(--coral);font-weight:600;margin-left:2px;}
+
+  .diagram-card{background:#fffdf8 !important;color:#2a2320;border:1px solid rgba(0,0,0,.06);
+    box-shadow:0 16px 40px rgba(0,0,0,.28) !important;}
+  .diagram-card .flow li{color:#2a2320;}
+  .diagram-card .assume{border-top-color:rgba(0,0,0,.12);}
+  .diagram-card .assume b{color:var(--coral);}
+
+  .tcard strong{color:#2a2320 !important;font-weight:700;}
+
+
+  .con-list{list-style:none;padding:0;margin:0 0 16px;text-align:left;display:inline-block;}
+  .con-list li{font-family:"Courier Prime",monospace;font-size:14.5px;line-height:1.4;color:#1a1712;
+    padding:6px 0 6px 20px;position:relative;}
+  .con-list li::before{content:"—";position:absolute;left:0;color:var(--coral);font-weight:700;}
+
+
+  /* add vs subtract — clear bad/good contrast */
+  .contrast{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:860px;margin:44px auto;align-items:stretch;}
+  .con-col{border-radius:18px;padding:28px 26px;text-align:left;display:flex;flex-direction:column;}
+  /* BAD: muted, faded, dead-end */
+  .con-old{background:#e9e3d6;border:1px solid rgba(0,0,0,.06);box-shadow:0 4px 12px rgba(0,0,0,.08);opacity:.85;}
+  .con-old .con-label{color:#9a8f7d;}
+  .con-old .con-move{color:#6b6152;}
+  .con-old .con-list li{color:#6b6152;}
+  .con-old .con-list li::before{content:"\00d7";color:#b9a98f;font-weight:700;}
+  /* GOOD: bright, lifted, terracotta-framed */
+  .con-new{background:#ffffff;border:1px solid rgba(0,0,0,.04);box-shadow:0 26px 56px rgba(0,0,0,.38);}
+  .con-new .con-label{color:var(--coral);}
+  .con-new .con-move{color:var(--navy);}
+  .con-new .con-list li{color:#1a1712;}
+  .con-new .con-list li::before{content:"\2713";color:#3fbf6a;font-weight:800;}
+  .con-new .con-list li b{font-family:"Archivo","Poppins",sans-serif;color:var(--navy);font-weight:800;font-size:1.05em;}
+  /* shared top line: label + verb on one line */
+  .con-top{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,.10);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .con-label{font-family:"Poppins",sans-serif;font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase;}
+  .con-move{font-family:"Archivo","Poppins",sans-serif;font-weight:900;font-size:clamp(22px,4vw,30px);line-height:1;}
+  .con-list{list-style:none;padding:0;margin:0 0 auto;flex:1;}
+  .con-list li{font-family:"Courier Prime",monospace;font-size:14px;line-height:1.45;padding:8px 0 8px 24px;position:relative;}
+  .con-list li::before{position:absolute;left:0;top:8px;}
+  /* outcome bars */
+  .con-out{margin-top:20px;padding-top:16px;border-top:1px solid rgba(0,0,0,.10);
+    font-family:"Poppins",sans-serif;font-size:15px;line-height:1.35;}
+  .con-out-bad{color:#8a7f6d;font-weight:600;}
+  .con-out-good{color:var(--navy);}
+  .con-out-good strong{font-family:"Archivo","Poppins",sans-serif;font-weight:900;font-size:clamp(18px,3.4vw,22px);color:var(--navy);}
+  @media(max-width:700px){.contrast{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -336,37 +394,26 @@
     <p>But almost all of it starts with the same assumption: <strong>that the person you are right now is fundamentally the right person, and your job is to improve them.</strong></p>
     <p><em>The Identity Tax</em> starts somewhere else.</p>
   </div>
-  <div class="cols2">
-    <div class="card" style="background:#243456;">
-      <div class="t" style="color:#fff;">The Old Way</div>
-      <div class="n" style="color:#c7b79b;font-family:'Poppins';font-size:12px;letter-spacing:.2em;text-transform:uppercase;">Add More</div>
-      <ul class="flow">
-        <li class="t" style="color:#fff;">You</li>
-        <li class="a">↓</li><li>Better habits</li>
-        <li class="a">↓</li><li>More discipline</li>
-        <li class="a">↓</li><li>Therapy + analysis</li>
-        <li class="a">↓</li><li>More frameworks</li>
-        <li class="a">↓</li><li>More self-awareness</li>
-        <li class="a">↓</li>
-        <li class="t" style="color:#fff;">Better at managing the person you already are</li>
+  <div class="contrast">
+    <div class="con-col con-old">
+      <div class="con-top"><span class="con-label">The Old Way</span> <span class="con-move">Add more.</span></div>
+      <ul class="con-list">
+        <li>Better habits</li>
+        <li>More discipline</li>
+        <li>More frameworks</li>
+        <li>More self-awareness</li>
       </ul>
-      <div class="assume"><b>The Assumption</b>You are fundamentally the right person. You just need improvement.</div>
+      <div class="con-out con-out-bad">You get better at managing the person you already are.</div>
     </div>
-    <div class="card" style="background:#243456;">
-      <div class="t" style="color:#fff;">The Identity Tax</div>
-      <div class="n" style="color:#c7b79b;font-family:'Poppins';font-size:12px;letter-spacing:.2em;text-transform:uppercase;">Remove First</div>
-      <ul class="flow">
-        <li class="t" style="color:#fff;">See</li><li style="font-size:14px;">What you've been carrying without realizing it.</li>
-        <li class="a">↓</li>
-        <li class="t" style="color:#fff;">Remove</li><li style="font-size:14px;">What you inherited, performed, or stopped questioning.</li>
-        <li class="a">↓</li>
-        <li class="t" style="color:#fff;">Choose</li><li style="font-size:14px;">What actually deserves to remain.</li>
-        <li class="a">↓</li>
-        <li class="t" style="color:#fff;">Build</li><li style="font-size:14px;">A life you authored instead of one you learned to perform.</li>
-        <li class="a">↓</li>
-        <li class="t" style="color:#fff;">Agency</li>
+    <div class="con-col con-new">
+      <div class="con-top"><span class="con-label">The Identity Tax</span> <span class="con-move">Subtract.</span></div>
+      <ul class="con-list">
+        <li><b>See</b> what you've been carrying without realizing it.</li>
+        <li><b>Remove</b> what you inherited, performed, or stopped questioning.</li>
+        <li><b>Choose</b> what actually deserves to remain.</li>
+        <li><b>Build</b> a life you authored, not performed.</li>
       </ul>
-      <div class="assume"><b>The Assumption</b>Before improving the person you are, ask how much of that person you ever consciously chose.</div>
+      <div class="con-out con-out-good"><strong>You get your life back.</strong></div>
     </div>
   </div>
   <h2 style="max-width:20ch;margin:56px auto 8px;">You Cannot <span class="r">Habit</span> Your Way Out of Being Someone You Were Never Meant to Be.</h2>
@@ -426,13 +473,34 @@
     <p>That practice eventually became <strong>The Second Life Protocol.</strong></p>
     <p>By the time I was writing this book, I was already selling it and watching other people go through it. Then the results started coming in.</p>
   </div>
-  <p class="big">And they were ridiculous.</p>
-  <div class="asset">[ Second Life Protocol — visual ]</div>
-  <div class="cols2" style="max-width:760px;">
-    <div class="asset" style="margin:0;">[ Result / testimonial screenshot ]</div>
-    <div class="asset" style="margin:0;">[ Result / testimonial screenshot ]</div>
-    <div class="asset" style="margin:0;">[ Result / testimonial screenshot ]</div>
-    <div class="asset" style="margin:0;">[ Result / testimonial screenshot ]</div>
+  <p class="big" style="font-size:clamp(20px,3.4vw,26px);">Here are a few of them.</p>
+  <div class="tgrid">
+    <div class="tcard">
+      <div class="thead">Nine to twelve months of avoidance. Five weeks in the Protocol. All three moves done.</div>
+      <p class="tquote">&ldquo;The partnership conversation happened. The community launched. <strong>People are paying to be in it.</strong> I'm posting as myself, finally.&rdquo;</p>
+      <div class="twho">G.N. <span class="tprof">Online Coach</span></div>
+    </div>
+
+    <div class="tcard">
+      <div class="thead">One exercise on Tuesday. One avoided conversation gone by Friday.</div>
+      <p class="tquote">&ldquo;<strong>It unlocked revenue I couldn't reach while I was still hiding from it.</strong> The exercise paid for the Protocol many times over in one week.&rdquo;</p>
+      <div class="twho">M.T. <span class="tprof">7-Figure Entrepreneur</span></div>
+    </div>
+
+    <div class="tcard">
+      <p class="tquote">&ldquo;DEFINITELY. I immediately joined a nutrition programme and am succeeding there. I've been looking into publishers and now have a clear direction&hellip; It was actually <strong>too effective straight away</strong> as I overwhelmed myself by starting the nutrition course, looking for publishers and trying to solve my business problems all at once. I've had to slow down and schedule things.&rdquo;</p>
+      <div class="twho">N.S. <span class="tprof">Author &amp; Business Owner</span></div>
+    </div>
+
+    <div class="tcard">
+      <p class="tquote">&ldquo;I've built an &lsquo;ideal client&rsquo; identity that everything revolves around and speaks to, rebuilt my offers, changed the way I communicate about what I'm doing, switched up my social media&hellip; <strong>it's almost impossible to state just how pivotal this process was</strong> in my business. (and in my own self-awareness)&rdquo;</p>
+      <div class="twho">V.G. <span class="tprof">Business Owner &amp; Mentor</span></div>
+    </div>
+
+    <div class="tcard">
+      <p class="tquote">&ldquo;It is really deep and I am a psychiatrist! It took me a couple times to read and digest&hellip; <strong>I can't smart, educate or age my way out of my own way!</strong> You have something that I feel has merit.&rdquo;</p>
+      <div class="twho">F.J. <span class="tprof">Psychiatrist &amp; Attorney</span></div>
+    </div>
   </div>
   <div class="lead">
     <p>People were making decisions they had been avoiding for years. Having conversations they had been rehearsing in their heads for months. Starting things. Ending things. Moving.</p>
@@ -510,9 +578,8 @@
   <p class="lead">Remember when I said, "Buy me lunch and I'll teach you everything I know"? <strong>I was being literal.</strong></p>
 
   <div class="offercard">
-    <div class="price">October · $30</div>
     <ul class="checks"><li><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>The private digital <b>prerelease</b> of <em>The Identity Tax</em>, before anyone else.</span></li><li><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>The complete <b>Second Life Protocol</b> — the practice itself.</span></li><li><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Four live 90-minute gatherings</b> with me, one each week.</span></li><li><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>The <b>Misalignment Quiz</b> and the <b>Second Life Contract</b>.</span></li><li><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Your <b>first physical issue</b> of <em>Les Essais de Benoît &amp; ___</em>, mailed to your house.</span></li><li><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>The <b>group</b> for the whole month.</span></li></ul>
-    <div class="btn-line" style="margin-bottom:0;"><a class="btn" href="#join">Join October<span class="sub">$30</span></a></div>
+    <div class="btn-line" style="margin-bottom:0;"><a class="btn" href="#join">Reserve Your Spot</a></div>
   </div>
 
 
