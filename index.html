@@ -648,9 +648,33 @@
     <p><strong>Join now and I'll send you the complete private prerelease of <em>The Identity Tax</em> immediately.</strong></p>
     <p>Read it at your own pace. On October 1, we begin together.</p>
   </div>
-  <div class="btn-line"><a class="btn" href="#">Get The Identity Tax + October<span class="sub">$30</span></a></div>
+  <div class="btn-line"><a class="btn" id="cta-button" href="#">Get The Identity Tax + October<span class="sub">$30</span></a></div>
   <p style="font-size:12px;letter-spacing:.06em;opacity:.7;margin-top:14px;">Enrollment closes October 1.</p>
 </section>
 
+<script>
+  document.getElementById('cta-button').addEventListener('click', async function (e) {
+      e.preventDefault();
+      const btn = e.currentTarget;
+      const original = btn.innerHTML;
+      btn.style.pointerEvents = 'none';
+      btn.textContent = 'Loading...';
+      try {
+            const res = await fetch('/api/create-checkout-session', { method: 'POST' });
+            const data = await res.json();
+            if (data.url) {
+                    window.location.href = data.url;
+            } else {
+                    throw new Error(data.error);
+            }
+      } catch (err) {
+            alert('Something went wrong. Please try again.');
+            btn.innerHTML = original;
+            btn.style.pointerEvents = 'auto';
+      }
+  });
+</script>
 </body>
 </html>
+
+</html>html>
