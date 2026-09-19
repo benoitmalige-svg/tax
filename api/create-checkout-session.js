@@ -19,6 +19,11 @@ export default async function handler(req, res) {
                 },
                 success_url: `${req.headers.origin}/?success=true`,
                 cancel_url: `${req.headers.origin}/?canceled=true`,
+                        custom_text: {
+                                            submit: {
+                                                                    message: 'You are paying $30 today for the complete private prerelease of The Identity Tax plus the October experience. Your $49/month membership begins November 1, 2026 -- cancel anytime before then and you will not be charged.',
+                                            },
+                        },
         });
 
       res.status(200).json({ url: session.url });
