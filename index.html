@@ -322,7 +322,7 @@
 </head>
 <body>
 
-<!-- HERO -->
+<div id="purchase-confirmation" style="display:none;"><div style="max-width:640px;margin:0 auto;padding:20px 24px;background:#eef7ee;border:1px solid #bfe3bf;border-radius:8px;text-align:center;"><p style="font-weight:bold;font-size:1.15em;margin:0 0 8px;">You're in.</p><p style="margin:0 0 8px;">Your copy of The Identity Tax is on its way to your inbox.</p><p style="margin:0 0 8px;">We begin October 1.</p><p style="margin:0;">You can start reading immediately. Check Promotions or Spam if you don't see the email within a few minutes.</p></div></div><!-- HERO -->
 <header class="band hero hero-top">
   <div class="kick">Private Release &nbsp;·&nbsp; October 1</div>
   <h1>THE IDENTITY TAX</h1>
@@ -673,6 +673,6 @@
             btn.style.pointerEvents = 'auto';
       }
   });
-</script>
+</script><script>(function(){var params=new URLSearchParams(window.location.search);if(params.get('success')==='true'){var banner=document.getElementById('purchase-confirmation');if(banner){banner.style.display='block';}}if(params.has('success')||params.has('canceled')){params.delete('success');params.delete('canceled');var newSearch=params.toString();var newUrl=window.location.pathname+(newSearch?'?'+newSearch:'')+window.location.hash;window.history.replaceState({},'',newUrl);}})();</script>
 </body>
 </html>
