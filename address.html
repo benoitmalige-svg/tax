@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Add Your Mailing Address — The Identity Tax</title>
+<style>
+  :root {
+    --cream: #F4ECDB;
+    --plum: #3D2A44;
+    --terracotta: #C96F4C;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--plum);
+    font-family: "Courier Prime", "Courier New", monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .card {
+    max-width: 480px;
+    width: 100%;
+  }
+  h1 {
+    font-family: Archivo, Poppins, system-ui, sans-serif;
+    color: var(--plum);
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0 0 12px;
+    line-height: 1.15;
+  }
+  p.sub {
+    margin: 0 0 32px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--plum);
+    opacity: 0.85;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    margin-top: 18px;
+    color: var(--terracotta);
+    font-weight: 700;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--plum);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--plum);
+    font-family: inherit;
+    font-size: 15px;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--terracotta);
+  }
+  .row {
+    display: flex;
+    gap: 12px;
+  }
+  .row > div {
+    flex: 1;
+  }
+  button {
+    margin-top: 28px;
+    width: 100%;
+    padding: 15px;
+    background: var(--terracotta);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: Archivo, Poppins, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+  }
+  button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .msg {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .msg.error { color: #a33; }
+  .msg.success { color: #2a7a4a; }
+  .success-screen h1 { margin-bottom: 16px; }
+  .required-note {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div id="formView">
+      <h1>Where should I send it?</h1>
+      <p class="sub">In October, I'm mailing you the first physical issue of Les Essais. Add your mailing address below and you're all set — worldwide shipping is included.</p>
+
+      <form id="addressForm">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" name="fullName" required autocomplete="name" />
+
+        <label for="addressLine1">Address Line 1</label>
+        <input type="text" id="addressLine1" name="addressLine1" required autocomplete="address-line1" />
+
+        <label for="addressLine2">Address Line 2 <span class="required-note">(optional)</span></label>
+        <input type="text" id="addressLine2" name="addressLine2" autocomplete="address-line2" />
+
+        <label for="city">City</label>
+        <input type="text" id="city" name="city" required autocomplete="address-level2" />
+
+        <div class="row">
+          <div>
+            <label for="state">State / Province / Region</label>
+            <input type="text" id="state" name="state" required autocomplete="address-level1" />
+          </div>
+          <div>
+            <label for="postalCode">Postal / ZIP Code</label>
+            <input type="text" id="postalCode" name="postalCode" required autocomplete="postal-code" />
+          </div>
+        </div>
+
+        <label for="country">Country</label>
+        <input type="text" id="country" name="country" required autocomplete="country-name" />
+
+        <button type="submit" id="submitBtn">ADD MY MAILING ADDRESS</button>
+        <div class="msg" id="statusMsg"></div>
+      </form>
+    </div>
+
+    <div id="successView" class="success-screen" style="display:none;">
+      <h1>Got it.</h1>
+      <p class="sub">Your address is saved. I'll mail your copy of Les Essais in October — no further action needed.</p>
+    </div>
+
+    <div id="noTokenView" style="display:none;">
+      <h1>Missing link details</h1>
+      <p class="sub">This page needs the link from your welcome email to know who you are. Please open the "ADD MY MAILING ADDRESS" button from that email.</p>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  const formView = document.getElementById('formView');
+  const successView = document.getElementById('successView');
+  const noTokenView = document.getElementById('noTokenView');
+  const form = document.getElementById('addressForm');
+  const statusMsg = document.getElementById('statusMsg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  if (!token) {
+    formView.style.display = 'none';
+    noTokenView.style.display = 'block';
+    return;
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    statusMsg.textContent = '';
+    statusMsg.className = 'msg';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'SAVING...';
+
+    const payload = {
+      token: token,
+      fullName: document.getElementById('fullName').value.trim(),
+      addressLine1: document.getElementById('addressLine1').value.trim(),
+      addressLine2: document.getElementById('addressLine2').value.trim(),
+      city: document.getElementById('city').value.trim(),
+      state: document.getElementById('state').value.trim(),
+      postalCode: document.getElementById('postalCode').value.trim(),
+      country: document.getElementById('country').value.trim(),
+    };
+
+    try {
+      const res = await fetch('/api/submit-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(function () { return {}; });
+
+      if (!res.ok || !data.success) {
+        throw new Error((data && data.error) || 'Something went wrong. Please try again.');
+      }
+
+      formView.style.display = 'none';
+      successView.style.display = 'block';
+    } catch (err) {
+      statusMsg.textContent = err.message || 'Something went wrong. Please try again.';
+      statusMsg.className = 'msg error';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'ADD MY MAILING ADDRESS';
+    }
+  });
+})();
+</script>
+</body>
+</html>
