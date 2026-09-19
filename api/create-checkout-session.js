@@ -21,7 +21,7 @@ export default async function handler(req, res) {
                 cancel_url: `${req.headers.origin}/?canceled=true`,
                         custom_text: {
                                             submit: {
-                                                                    message: 'You are paying $30 today for the complete private prerelease of The Identity Tax plus the October experience. Your $49/month membership begins November 1, 2026 -- cancel anytime before then and you will not be charged.',
+                                                                                                                                    message: '$30 today includes the complete private prerelease + October. Your subscription continues at $49/month beginning November 1. Cancel before then and you won\'t be charged again.',
                                             },
                         },
         });
