@@ -21,7 +21,7 @@ export default async function handler(req, res) {
                 cancel_url: `${req.headers.origin}/?canceled=true`,
                         custom_text: {
                                             submit: {
-                                                                                                                                    message: '$30 today includes the complete private prerelease + October. Your subscription continues at $49/month beginning November 1. Cancel before then and you won\'t be charged again.',
+                                                                                                                                    message: '$30 today includes the complete private prerelease + October. Your subscription continues at $49/month beginning November 1. Cancel before November 1 and you won\'t be charged again.',
                                             },
                         },
         });
