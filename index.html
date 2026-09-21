@@ -348,7 +348,7 @@
 </head>
 <body>
 
-<div id="purchase-confirmation" style="display:none;"><div style="max-width:640px;margin:0 auto;padding:20px 24px;background:#eef7ee;border:1px solid #bfe3bf;border-radius:8px;text-align:center;"><p style="font-weight:bold;font-size:1.15em;margin:0 0 8px;">You're in.</p><p style="margin:0 0 8px;">Your copy of The Identity Tax is on its way to your inbox.</p><p style="margin:0 0 8px;">We begin October 1.</p><p style="margin:0;">You can start reading immediately. Check Promotions or Spam if you don't see the email within a few minutes.</p></div></div><!-- HERO -->
+<div id="purchase-confirmation" style="display:none;"><div style="max-width:640px;margin:0 auto;padding:20px 24px;background:#eef7ee;border:1px solid #bfe3bf;border-radius:8px;text-align:center;"><p style="font-weight:bold;font-size:1.15em;margin:0 0 8px;">You're in.</p><p style="margin:0 0 8px;">Your copy of The Identity Tax is on its way to your inbox.</p><p style="margin:0 0 8px;">We begin October 1.</p><p style="margin:0;">You can start reading immediately. Check Promotions or Spam if you don't see the email within a few minutes.</p></div></div><div id="purchase-confirmation-book" style="display:none;"><div style="max-width:640px;margin:0 auto;padding:20px 24px;background:#eef7ee;border:1px solid #bfe3bf;border-radius:8px;text-align:center;"><p style="font-weight:bold;font-size:1.15em;margin:0 0 8px;">You're in.</p><p style="margin:0 0 8px;">Your copy of The Identity Tax is on its way to your inbox.</p><p style="margin:0;">Check Promotions or Spam if you don't see the email within a few minutes.</p></div></div><!-- HERO -->
 <header class="band hero hero-top">
   <div class="kick">Private Release &nbsp;·&nbsp; October 1</div>
   <h1>THE IDENTITY TAX</h1>
@@ -642,7 +642,7 @@
         <p>The complete digital private pre-release.<br>Instant manuscript access.<br>No physical Les Essais.</p>
       </div>
       <div class="choice-price">$60 <span class="choice-price-note">once</span></div>
-      <a class="btn choice-btn" href="#book-only">Get the book &mdash; $60</a>
+      <a class="btn choice-btn" id="cta-button-book" href="#">Get the book &mdash; $60</a>
     </div>
 
     <div class="choice choice-rec">
@@ -653,7 +653,7 @@
       </div>
       <div class="choice-price">$30 <span class="choice-price-note">today</span></div>
       <div class="choice-terms">Then $49/month beginning November 1 if you stay.<br>Cancel before November 1 and pay nothing else.</div>
-      <a class="btn choice-btn" href="#join">Give me October &mdash; $30</a>
+      <a class="btn choice-btn" id="cta-button-october" href="#">Give me October &mdash; $30</a>
     </div>
   </div>
 
@@ -742,6 +742,6 @@
             btn.style.pointerEvents = 'auto';
       }
   });
-</script><script>(function(){var params=new URLSearchParams(window.location.search);if(params.get('success')==='true'){var banner=document.getElementById('purchase-confirmation');if(banner){banner.style.display='block';}}if(params.has('success')||params.has('canceled')){params.delete('success');params.delete('canceled');var newSearch=params.toString();var newUrl=window.location.pathname+(newSearch?'?'+newSearch:'')+window.location.hash;window.history.replaceState({},'',newUrl);}})();</script>
+</script><script>document.getElementById('cta-button-book').addEventListener('click',async function(e){e.preventDefault();var btn=e.currentTarget;var original=btn.innerHTML;btn.style.pointerEvents='none';btn.textContent='Loading...';try{var res=await fetch('/api/create-checkout-session-book',{method:'POST'});var data=await res.json();if(data.url){window.location.href=data.url;}else{throw new Error(data.error);}}catch(err){alert('Something went wrong. Please try again.');btn.innerHTML=original;btn.style.pointerEvents='auto';}});document.getElementById('cta-button-october').addEventListener('click',async function(e){e.preventDefault();var btn=e.currentTarget;var original=btn.innerHTML;btn.style.pointerEvents='none';btn.textContent='Loading...';try{var res=await fetch('/api/create-checkout-session',{method:'POST'});var data=await res.json();if(data.url){window.location.href=data.url;}else{throw new Error(data.error);}}catch(err){alert('Something went wrong. Please try again.');btn.innerHTML=original;btn.style.pointerEvents='auto';}});</script><script>(function(){var params=new URLSearchParams(window.location.search);if(params.get('success')==='true'){var isBookOnly=params.get('product')==='book-only';var banner=document.getElementById(isBookOnly?'purchase-confirmation-book':'purchase-confirmation');if(banner){banner.style.display='block';}}if(params.has('success')||params.has('canceled')||params.has('product')){params.delete('success');params.delete('canceled');params.delete('product');var newSearch=params.toString();var newUrl=window.location.pathname+(newSearch?'?'+newSearch:'')+window.location.hash;window.history.replaceState({},'',newUrl);}})();</script>
 </body>
 </html>
