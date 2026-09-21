@@ -81,6 +81,63 @@ async function addToBeehiiv(email) {
   return data;
 }
 
+async function addBookOnlyToBeehiiv(email) {
+  const pubId = process.env.BEEHIIV_PUBLICATION_ID;
+  const apiKey = process.env.BEEHIIV_API_KEY;
+  const automationId = process.env.BEEHIIV_AUTOMATION_ID_BOOK_ONLY;
+
+  console.log('DEBUG book-only pubId present:', Boolean(pubId), 'apiKey present:', Boolean(apiKey), 'automationId present:', Boolean(automationId));
+
+  const response = await fetch(
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        reactivate_existing: true,
+        send_welcome_email: false,
+        automation_ids: automationId ? [automationId] : [],
+      }),
+    }
+    );
+
+  const rawText = await response.text();
+  console.log('DEBUG Beehiiv book-only create status:', response.status);
+  console.log('DEBUG Beehiiv book-only create body:', rawText);
+
+  if (!response.ok) {
+    throw new Error(`Beehiiv book-only create/update subscriber failed (${response.status}): ${rawText}`);
+  }
+
+  const data = JSON.parse(rawText);
+  const subscriptionId = data && data.data && data.data.id;
+
+  if (subscriptionId) {
+    const tagResponse = await fetch(
+      `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subscriptionId}/tags`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tags: ['identity-tax-book-only-purchased'] }),
+      }
+      );
+
+    const tagText = await tagResponse.text();
+    console.log('DEBUG Beehiiv book-only tag status:', tagResponse.status);
+    console.log('DEBUG Beehiiv book-only tag body:', tagText);
+  }
+
+  return data;
+}
+
+
 async function setAddressToken(email) {
   const pubId = process.env.BEEHIIV_PUBLICATION_ID;
   const apiKey = process.env.BEEHIIV_API_KEY;
@@ -142,17 +199,28 @@ export default async function handler(req, res) {
     console.log('DEBUG checkout.session.completed email:', email);
 
     if (email) {
-      try {
-        await addToBeehiiv(email);
-      } catch (err) {
-        console.error('Beehiiv sync failed:', err);
-      }
+      const isBookOnly = session.metadata && session.metadata.product === 'identity-tax-book-only';
 
-      try {
-        await setAddressToken(email);
-      } catch (err) {
-        console.error('Beehiiv address token sync failed:', err);
+      if (isBookOnly) {
+        try {
+          await addBookOnlyToBeehiiv(email);
+        } catch (err) {
+          console.error('Beehiiv book-only sync failed:', err);
+        }
+      } else {
+        try {
+          await addToBeehiiv(email);
+        } catch (err) {
+          console.error('Beehiiv sync failed:', err);
+        }
+
+        try {
+          await setAddressToken(email);
+        } catch (err) {
+          console.error('Beehiiv address token sync failed:', err);
+        }
       }
+      
     } else {
       console.error('No email found on checkout session', session.id);
     }
