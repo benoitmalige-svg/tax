@@ -16,7 +16,7 @@ try {
     metadata: {
       product: 'identity-tax-book-only',
     },
-    success_url: `${req.headers.origin}/?success=true`,
+    success_url: `${req.headers.origin}/?success=true&product=book-only`,
     cancel_url: `${req.headers.origin}/?canceled=true`,
     custom_text: {
       submit: {
