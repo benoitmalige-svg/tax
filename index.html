@@ -348,6 +348,12 @@ inject();
   .thesis-line{font-family:"Archivo","Poppins",sans-serif;font-weight:800;color:var(--navy);
     font-size:clamp(19px,3vw,23px);line-height:1.3;margin:20px auto;max-width:34ch;}
 
+.intro-capture{max-width:640px;margin:66px auto 0;text-align:center;background:#f0e7d2;border:1px solid rgba(0,0,0,.08);border-radius:20px;box-shadow:0 10px 30px rgba(40,33,20,.08);padding:38px 34px;}
+.intro-capture-kicker{font-family:"Poppins",sans-serif;font-weight:700;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--coral);margin-bottom:12px;}
+.intro-capture-head{font-family:"Archivo","Poppins",sans-serif;font-weight:800;color:var(--navy);font-size:clamp(20px,3.2vw,25px);line-height:1.22;margin-bottom:10px;}
+.intro-capture-sub{font-family:"Courier Prime",monospace;font-size:15px;line-height:1.6;color:#4a4038;max-width:42ch;margin:0 auto 24px;}
+.intro-capture-embed{max-width:440px;margin:0 auto;}
+@media(max-width:480px){.intro-capture{padding:32px 22px;}}
 </style>
 </head>
 <body>
@@ -689,6 +695,17 @@ inject();
     <p>If you want to stay, your subscription continues <strong>November 1 at $49/month</strong>: a new physical issue of <em>Les Essais</em> every month, your seat at the table, the private room, and one live monthly gathering with me.</p><p>If you don't, cancel before November 1 and you won't be charged again.</p>
     <p><strong>The initial $30 is non-refundable because access begins immediately.</strong></p>
   </div>
+  <!-- ============ READ THE INTRODUCTION (secondary email capture) ============ -->
+  <div class="intro-capture">
+    <div class="intro-capture-kicker">Still deciding?</div>
+    <div class="intro-capture-head">Not ready? Read the introduction first.</div>
+    <p class="intro-capture-sub">I'd rather you read the first few pages and decide for yourself whether this book is for you.</p>
+    <div class="intro-capture-embed">
+      <!-- BEEHIIV EMBED: Read the Introduction form -->
+      <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="f8447518-2dbe-403b-9835-9aa57d138d67"></script>
+    </div>
+  </div>
+  <!-- ============ END READ THE INTRODUCTION ============ -->
 
   <h2 style="margin:56px auto 6px;">A Few Practical Things</h2>
   <p class="lead">You've made it this far. So rather than hide the annoying details in tiny type, let me answer the questions I'd be asking if I were you.</p>
