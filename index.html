@@ -476,32 +476,6 @@ inject();
 <!-- OFFER -->
 <!-- FINAL -->
 <script>(function () {
-  var btn = document.getElementById('cta-button-book');
-  if (!btn) return;
-  btn.addEventListener('click', async function (e) {
-    e.preventDefault();
-    if (btn.dataset.loading === 'true') return;
-    var original = btn.innerHTML;
-    btn.dataset.loading = 'true';
-    btn.setAttribute('aria-busy', 'true');
-    btn.style.pointerEvents = 'none';
-    btn.textContent = 'Loading…';
-    try {
-      var res = await fetch('/api/create-checkout-session-book', { method: 'POST' });
-      if (!res.ok) throw new Error('Checkout unavailable (' + res.status + ')');
-      var data = await res.json();
-      if (!data.url) throw new Error(data.error || 'Missing checkout URL');
-      window.location.assign(data.url);
-    } catch (err) {
-      console.error('Book checkout error:', err);
-      alert('Checkout is temporarily unavailable. Please try again.');
-      btn.innerHTML = original;
-      btn.style.pointerEvents = '';
-      btn.removeAttribute('aria-busy');
-      delete btn.dataset.loading;
-    }
-  });
-})();</script><script>(function () {
   var params = new URLSearchParams(window.location.search);
   if (params.get('success') === 'true') {
     var banner = document.getElementById('purchase-confirmation-book');
@@ -558,5 +532,32 @@ inject();
 <!-- BEEHIIV EMBED: Read the Introduction form -->
 <script async="" data-beehiiv-form="f8447518-2dbe-403b-9835-9aa57d138d67" src="https://subscribe-forms.beehiiv.com/v3/loader.js"></script>
 </div>
-</div></body>
+</div><script>(function () {
+  var btn = document.getElementById('cta-button-book');
+  if (!btn) return;
+  btn.addEventListener('click', async function (e) {
+    e.preventDefault();
+    if (btn.dataset.loading === 'true') return;
+    var original = btn.innerHTML;
+    btn.dataset.loading = 'true';
+    btn.setAttribute('aria-busy', 'true');
+    btn.style.pointerEvents = 'none';
+    btn.textContent = 'Loading…';
+    try {
+      var res = await fetch('/api/create-checkout-session-book', { method: 'POST' });
+      if (!res.ok) throw new Error('Checkout unavailable (' + res.status + ')');
+      var data = await res.json();
+      if (!data.url) throw new Error(data.error || 'Missing checkout URL');
+      window.location.assign(data.url);
+    } catch (err) {
+      console.error('Book checkout error:', err);
+      alert('Checkout is temporarily unavailable. Please try again.');
+      btn.innerHTML = original;
+      btn.style.pointerEvents = '';
+      btn.removeAttribute('aria-busy');
+      delete btn.dataset.loading;
+    }
+  });
+})();</script>
+</body>
 </html>
