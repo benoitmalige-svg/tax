@@ -170,6 +170,18 @@ async function setAddressToken(email) {
   }
 }
 
+// Products that should receive the (historical) October Experience flow.
+// Matched by Stripe product ID, never by price.
+const OCTOBER_PRODUCT_IDS = new Set([
+  'prod_VHxhlkz6fW16Ko', // The Identity Tax + October
+  'prod_VPXoEGESr08m5s', // The October Experience — Late Entry
+]);
+
+async function isOctoberPurchase(sessionId) {
+  const items = await stripe.checkout.sessions.listLineItems(sessionId, { limit: 10 });
+  return items.data.some((li) => li.price && OCTOBER_PRODUCT_IDS.has(li.price.product));
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -199,25 +211,41 @@ export default async function handler(req, res) {
     console.log('DEBUG checkout.session.completed email:', email);
 
     if (email) {
-      const isBookOnly = session.metadata && session.metadata.product === 'identity-tax-book-only';
+      const meta = session.metadata || {};
 
-      if (isBookOnly) {
+      if (meta.product === 'identity-tax-book-only') {
+        // Identity Tax book delivery (unchanged)
         try {
           await addBookOnlyToBeehiiv(email);
         } catch (err) {
           console.error('Beehiiv book-only sync failed:', err);
         }
+      } else if (meta.business === 'les-essais') {
+        // Les Essais: log only until its own welcome automation is connected
+        console.log('Les Essais checkout received; no Beehiiv action yet:', session.id);
       } else {
+        let october = false;
         try {
-          await addToBeehiiv(email);
+          october = await isOctoberPurchase(session.id);
         } catch (err) {
-          console.error('Beehiiv sync failed:', err);
+          console.error('Line-item lookup failed; skipping Beehiiv for', session.id, err);
         }
 
-        try {
-          await setAddressToken(email);
-        } catch (err) {
-          console.error('Beehiiv address token sync failed:', err);
+        if (october) {
+          try {
+            await addToBeehiiv(email);
+          } catch (err) {
+            console.error('Beehiiv sync failed:', err);
+          }
+
+          try {
+            await setAddressToken(email);
+          } catch (err) {
+            console.error('Beehiiv address token sync failed:', err);
+          }
+        } else {
+          // Unf*ck Your Thinking (sold via Beehiiv), 30-Day Intensive, and anything else
+          console.log('Unhandled checkout; no Beehiiv action:', session.id);
         }
       }
       
