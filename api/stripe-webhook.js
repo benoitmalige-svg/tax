@@ -170,6 +170,83 @@ async function setAddressToken(email) {
   }
 }
 
+const LES_ESSAIS_TAG = 'les-essais-member';
+
+async function addLesEssaisToBeehiiv(email) {
+  const pubId = process.env.BEEHIIV_PUBLICATION_ID;
+  const apiKey = process.env.BEEHIIV_API_KEY;
+  const automationId = process.env.BEEHIIV_AUTOMATION_ID_LES_ESSAIS;
+
+  if (!automationId) {
+    console.error('BEEHIIV_AUTOMATION_ID_LES_ESSAIS is not set; skipping Les Essais welcome');
+    return;
+  }
+
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+  };
+
+  // Duplicate guard: Stripe can deliver the same event more than once (retries,
+  // manual resends). A member who already has the tag has already been welcomed.
+  // The Beehiiv automation is also "enter once", as a second safeguard.
+  const lookup = await fetch(
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/by_email/${encodeURIComponent(email)}?expand[]=tags`,
+    { method: 'GET', headers }
+  );
+
+  if (lookup.ok) {
+    const existing = await lookup.json();
+    const tags = ((existing && existing.data && existing.data.tags) || [])
+      .map((t) => (typeof t === 'string' ? t : t && t.name));
+    if (tags.includes(LES_ESSAIS_TAG)) {
+      console.log('Les Essais: subscriber already tagged, skipping duplicate welcome');
+      return;
+    }
+  } else if (lookup.status !== 404) {
+    // Lookup failed for another reason: continue; the enter-once automation still prevents a second email.
+    console.error('Les Essais: Beehiiv lookup failed, continuing with enrollment:', lookup.status);
+  }
+
+  const response = await fetch(
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        email,
+        reactivate_existing: true,
+        send_welcome_email: false,
+        automation_ids: [automationId],
+      }),
+    }
+  );
+
+  const rawText = await response.text();
+  console.log('DEBUG Beehiiv Les Essais create status:', response.status);
+
+  if (!response.ok) {
+    throw new Error(`Beehiiv Les Essais create/update subscriber failed (${response.status}): ${rawText}`);
+  }
+
+  const data = JSON.parse(rawText);
+  const subscriptionId = data && data.data && data.data.id;
+
+  if (subscriptionId) {
+    const tagResponse = await fetch(
+      `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subscriptionId}/tags`,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ tags: [LES_ESSAIS_TAG] }),
+      }
+    );
+    console.log('DEBUG Beehiiv Les Essais tag status:', tagResponse.status);
+  }
+
+  return data;
+}
+
 // Products that should receive the (historical) October Experience flow.
 // Matched by Stripe product ID, never by price.
 const OCTOBER_PRODUCT_IDS = new Set([
@@ -221,8 +298,13 @@ export default async function handler(req, res) {
           console.error('Beehiiv book-only sync failed:', err);
         }
       } else if (meta.business === 'les-essais') {
-        // Les Essais: log only until its own welcome automation is connected
-        console.log('Les Essais checkout received; no Beehiiv action yet:', session.id);
+        // Les Essais: welcome automation + member tag (no October flow, no address token)
+        console.log('Les Essais checkout received:', session.id);
+        try {
+          await addLesEssaisToBeehiiv(email);
+        } catch (err) {
+          console.error('Beehiiv Les Essais sync failed:', err);
+        }
       } else {
         let october = false;
         try {
