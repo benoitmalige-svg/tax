@@ -19,6 +19,11 @@ export default async function handler(req, res) {
                 },
                 success_url: `${req.headers.origin}/?success=true`,
                 cancel_url: `${req.headers.origin}/?canceled=true`,
+                        custom_text: {
+                                            submit: {
+                                                                                                                                    message: '$30 today includes the complete private prerelease + October. Your subscription continues at $49/month beginning November 1. Cancel before November 1 and you won\'t be charged again.',
+                                            },
+                        },
         });
 
       res.status(200).json({ url: session.url });

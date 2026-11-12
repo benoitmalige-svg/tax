@@ -1,115 +1,339 @@
 import Stripe from 'stripe';
+import crypto from 'crypto';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const config = {
-      api: {
-              bodyParser: false,
-      },
+  api: {
+    bodyParser: false,
+  },
 };
 
 function buffer(readable) {
-      return new Promise((resolve, reject) => {
-              const chunks = [];
-              readable.on('data', (chunk) => chunks.push(chunk));
-              readable.on('end', () => resolve(Buffer.concat(chunks)));
-              readable.on('error', reject);
-      });
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    readable.on('data', (chunk) => chunks.push(chunk));
+    readable.on('end', () => resolve(Buffer.concat(chunks)));
+    readable.on('error', reject);
+  });
+}
+
+function generateAddressToken(email) {
+  const secret = process.env.ADDRESS_TOKEN_SECRET;
+  const payload = Buffer.from(email, 'utf8').toString('base64url');
+  const sig = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+  return `${payload}.${sig}`;
 }
 
 async function addToBeehiiv(email) {
-      const pubId = process.env.BEEHIIV_PUBLICATION_ID;
-      const apiKey = process.env.BEEHIIV_API_KEY;
-      const automationId = process.env.BEEHIIV_AUTOMATION_ID;
+  const pubId = process.env.BEEHIIV_PUBLICATION_ID;
+  const apiKey = process.env.BEEHIIV_API_KEY;
+  const automationId = process.env.BEEHIIV_AUTOMATION_ID;
 
   console.log('DEBUG pubId present:', Boolean(pubId), 'apiKey present:', Boolean(apiKey), 'automationId present:', Boolean(automationId));
 
   const response = await fetch(
-          `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
-      {
-                method: 'POST',
-                headers: {
-                            Authorization: `Bearer ${apiKey}`,
-                            'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                            email,
-                            reactivate_existing: true,
-                            send_welcome_email: false,
-                            automation_ids: automationId ? [automationId] : [],
-                }),
-      }
-        );
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        reactivate_existing: true,
+        send_welcome_email: false,
+        automation_ids: automationId ? [automationId] : [],
+      }),
+    }
+  );
 
   const rawText = await response.text();
-      console.log('DEBUG Beehiiv create status:', response.status);
-      console.log('DEBUG Beehiiv create body:', rawText);
+  console.log('DEBUG Beehiiv create status:', response.status);
+  console.log('DEBUG Beehiiv create body:', rawText);
 
   if (!response.ok) {
-          throw new Error(`Beehiiv create/update subscriber failed (${response.status}): ${rawText}`);
+    throw new Error(`Beehiiv create/update subscriber failed (${response.status}): ${rawText}`);
   }
 
   const data = JSON.parse(rawText);
-      const subscriptionId = data && data.data && data.data.id;
+  const subscriptionId = data && data.data && data.data.id;
 
   if (subscriptionId) {
-          const tagResponse = await fetch(
-                    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subscriptionId}/tags`,
-              {
-                          method: 'POST',
-                          headers: {
-                                        Authorization: `Bearer ${apiKey}`,
-                                        'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({ tags: ['identity-tax-oct-purchased'] }),
-              }
-                  );
+    const tagResponse = await fetch(
+      `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subscriptionId}/tags`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tags: ['identity-tax-oct-purchased'] }),
+      }
+    );
 
-        const tagText = await tagResponse.text();
-          console.log('DEBUG Beehiiv tag status:', tagResponse.status);
-          console.log('DEBUG Beehiiv tag body:', tagText);
+    const tagText = await tagResponse.text();
+    console.log('DEBUG Beehiiv tag status:', tagResponse.status);
+    console.log('DEBUG Beehiiv tag body:', tagText);
   }
 
   return data;
 }
 
-export default async function handler(req, res) {
-      if (req.method !== 'POST') {
-              return res.status(405).json({ error: 'Method not allowed' });
+async function addBookOnlyToBeehiiv(email) {
+  const pubId = process.env.BEEHIIV_PUBLICATION_ID;
+  const apiKey = process.env.BEEHIIV_API_KEY;
+  const automationId = process.env.BEEHIIV_AUTOMATION_ID_BOOK_ONLY;
+
+  console.log('DEBUG book-only pubId present:', Boolean(pubId), 'apiKey present:', Boolean(apiKey), 'automationId present:', Boolean(automationId));
+
+  const response = await fetch(
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        reactivate_existing: true,
+        send_welcome_email: false,
+        automation_ids: automationId ? [automationId] : [],
+      }),
+    }
+    );
+
+  const rawText = await response.text();
+  console.log('DEBUG Beehiiv book-only create status:', response.status);
+  console.log('DEBUG Beehiiv book-only create body:', rawText);
+
+  if (!response.ok) {
+    throw new Error(`Beehiiv book-only create/update subscriber failed (${response.status}): ${rawText}`);
+  }
+
+  const data = JSON.parse(rawText);
+  const subscriptionId = data && data.data && data.data.id;
+
+  if (subscriptionId) {
+    const tagResponse = await fetch(
+      `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subscriptionId}/tags`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tags: ['identity-tax-book-only-purchased'] }),
       }
+      );
+
+    const tagText = await tagResponse.text();
+    console.log('DEBUG Beehiiv book-only tag status:', tagResponse.status);
+    console.log('DEBUG Beehiiv book-only tag body:', tagText);
+  }
+
+  return data;
+}
+
+
+async function setAddressToken(email) {
+  const pubId = process.env.BEEHIIV_PUBLICATION_ID;
+  const apiKey = process.env.BEEHIIV_API_KEY;
+
+  const token = generateAddressToken(email);
+
+  const response = await fetch(
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/by_email/${encodeURIComponent(email)}`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        custom_fields: [
+          { name: 'Address Token', value: token },
+          { name: 'Shipping Address Complete', value: false },
+        ],
+      }),
+    }
+  );
+
+  const rawText = await response.text();
+  console.log('DEBUG Beehiiv set address token status:', response.status);
+  console.log('DEBUG Beehiiv set address token body:', rawText);
+
+  if (!response.ok) {
+    throw new Error(`Beehiiv set address token failed (${response.status}): ${rawText}`);
+  }
+}
+
+const LES_ESSAIS_TAG = 'les-essais-member';
+
+async function addLesEssaisToBeehiiv(email) {
+  const pubId = process.env.BEEHIIV_PUBLICATION_ID;
+  const apiKey = process.env.BEEHIIV_API_KEY;
+  const automationId = process.env.BEEHIIV_AUTOMATION_ID_LES_ESSAIS;
+
+  if (!automationId) {
+    console.error('BEEHIIV_AUTOMATION_ID_LES_ESSAIS is not set; skipping Les Essais welcome');
+    return;
+  }
+
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+  };
+
+  // Duplicate guard: Stripe can deliver the same event more than once (retries,
+  // manual resends). A member who already has the tag has already been welcomed.
+  // The Beehiiv automation is also "enter once", as a second safeguard.
+  const lookup = await fetch(
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/by_email/${encodeURIComponent(email)}?expand[]=tags`,
+    { method: 'GET', headers }
+  );
+
+  if (lookup.ok) {
+    const existing = await lookup.json();
+    const tags = ((existing && existing.data && existing.data.tags) || [])
+      .map((t) => (typeof t === 'string' ? t : t && t.name));
+    if (tags.includes(LES_ESSAIS_TAG)) {
+      console.log('Les Essais: subscriber already tagged, skipping duplicate welcome');
+      return;
+    }
+  } else if (lookup.status !== 404) {
+    // Lookup failed for another reason: continue; the enter-once automation still prevents a second email.
+    console.error('Les Essais: Beehiiv lookup failed, continuing with enrollment:', lookup.status);
+  }
+
+  const response = await fetch(
+    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        email,
+        reactivate_existing: true,
+        send_welcome_email: false,
+        automation_ids: [automationId],
+      }),
+    }
+  );
+
+  const rawText = await response.text();
+  console.log('DEBUG Beehiiv Les Essais create status:', response.status);
+
+  if (!response.ok) {
+    throw new Error(`Beehiiv Les Essais create/update subscriber failed (${response.status}): ${rawText}`);
+  }
+
+  const data = JSON.parse(rawText);
+  const subscriptionId = data && data.data && data.data.id;
+
+  if (subscriptionId) {
+    const tagResponse = await fetch(
+      `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions/${subscriptionId}/tags`,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ tags: [LES_ESSAIS_TAG] }),
+      }
+    );
+    console.log('DEBUG Beehiiv Les Essais tag status:', tagResponse.status);
+  }
+
+  return data;
+}
+
+// Products that should receive the (historical) October Experience flow.
+// Matched by Stripe product ID, never by price.
+const OCTOBER_PRODUCT_IDS = new Set([
+  'prod_VHxhlkz6fW16Ko', // The Identity Tax + October
+  'prod_VPXoEGESr08m5s', // The October Experience — Late Entry
+]);
+
+async function isOctoberPurchase(sessionId) {
+  const items = await stripe.checkout.sessions.listLineItems(sessionId, { limit: 10 });
+  return items.data.some((li) => li.price && OCTOBER_PRODUCT_IDS.has(li.price.product));
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   let event;
 
   try {
-          const rawBody = await buffer(req);
-          const signature = req.headers['stripe-signature'];
-          event = stripe.webhooks.constructEvent(
-                    rawBody,
-                    signature,
-                    process.env.STRIPE_WEBHOOK_SECRET
-                  );
+    const rawBody = await buffer(req);
+    const signature = req.headers['stripe-signature'];
+    event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
   } catch (err) {
-          console.error('Webhook signature verification failed:', err.message);
-          return res.status(400).json({ error: 'Invalid signature' });
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).json({ error: 'Invalid signature' });
   }
 
   if (event.type === 'checkout.session.completed') {
-          const session = event.data.object;
-          const email =
-                    (session.customer_details && session.customer_details.email) ||
-                    session.customer_email;
+    const session = event.data.object;
+    const email =
+      (session.customer_details && session.customer_details.email) ||
+      session.customer_email;
 
-        console.log('DEBUG checkout.session.completed email:', email);
+    console.log('DEBUG checkout.session.completed email:', email);
 
-        if (email) {
-                  try {
-                              await addToBeehiiv(email);
-                  } catch (err) {
-                              console.error('Beehiiv sync failed:', err);
-                  }
-        } else {
-                  console.error('No email found on checkout session', session.id);
+    if (email) {
+      const meta = session.metadata || {};
+
+      if (meta.product === 'identity-tax-book-only') {
+        // Identity Tax book delivery (unchanged)
+        try {
+          await addBookOnlyToBeehiiv(email);
+        } catch (err) {
+          console.error('Beehiiv book-only sync failed:', err);
         }
+      } else if (meta.business === 'les-essais') {
+        // Les Essais: welcome automation + member tag (no October flow, no address token)
+        console.log('Les Essais checkout received:', session.id);
+        try {
+          await addLesEssaisToBeehiiv(email);
+        } catch (err) {
+          console.error('Beehiiv Les Essais sync failed:', err);
+        }
+      } else {
+        let october = false;
+        try {
+          october = await isOctoberPurchase(session.id);
+        } catch (err) {
+          console.error('Line-item lookup failed; skipping Beehiiv for', session.id, err);
+        }
+
+        if (october) {
+          try {
+            await addToBeehiiv(email);
+          } catch (err) {
+            console.error('Beehiiv sync failed:', err);
+          }
+
+          try {
+            await setAddressToken(email);
+          } catch (err) {
+            console.error('Beehiiv address token sync failed:', err);
+          }
+        } else {
+          // Unf*ck Your Thinking (sold via Beehiiv), 30-Day Intensive, and anything else
+          console.log('Unhandled checkout; no Beehiiv action:', session.id);
+        }
+      }
+      
+    } else {
+      console.error('No email found on checkout session', session.id);
+    }
   }
 
   res.status(200).json({ received: true });
