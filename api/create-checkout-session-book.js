@@ -20,7 +20,7 @@ try {
     cancel_url: `${req.headers.origin}/?canceled=true`,
     custom_text: {
       submit: {
-        message: '$29 one-time for the complete digital edition of The Identity Tax, including my 33-page philosophical essay on purpose. Immediate access by email. No subscription, no recurring charge.',
+        message: '$29 one-time for the complete digital edition of The Identity Tax (PDF and EPUB), including a private invitation to read my philosophical essay on purpose. Immediate book access by email. No subscription, no recurring charge.',
       },
     },
   });
